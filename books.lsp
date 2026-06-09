@@ -1,0 +1,219 @@
+#| 
+  integrantes:
+  Nicolas Rocha Gutierrez
+  Jose David Hurtado Arandano
+|#
+
+; Funcion encargada de añadir un libro
+(defun addBook()
+    (if (>= bookCount (length bookArray))
+        (print "No hay espacio para mas libros")
+        (progn
+            (setq book (make-Book))
+            ;valida nombre del libro
+            (loop   
+                (print "Digite el nombre del libro(con comillas, ejemplo: \"El Principito\"): ")
+                (setq bookTitle (read))
+                (when (stringp bookTitle) (return))
+                (print "Nombre del libro no aceptado, no olvide las comillas")
+            )
+            (setf (Book-title book) bookTitle)
+
+            #|
+            --------------------------------------------------------------------------------------------------
+            IMPORTANTEEEEEE
+            Podemos dejarlo asi, o dejar ya unos temas en especifico, y simplemente que 
+            la persona los seleccione en vez de digitarlos
+            --------------------------------------------------------------------------------------------------
+            |#
+            ;valida tema del libro
+            (loop   
+                (print "Digite el tema del libro (con comillas, ejemplo: \"Fantasia\"): ")
+                (setq  bookTopic (read))
+                (when (stringp bookTopic) (return))
+                (print "Tema no aceptado, no olvide las comillas")
+            )
+            (setf (Book-topic book) bookTopic)
+
+            ;valida nombre del autor
+            (loop   
+                (print "Digite el nombre del autor(con comillas, ejemplo: \"Antoine de Saint-Exupery\"): ")
+                (setq bookAuthor (read))
+                (when (stringp bookAuthor) (return))
+                (print "Nombre del autor no aceptado, no olvide las comillas")
+            )
+            (setf (Book-author book) bookAuthor)
+
+            ;valida nombre de la editorial
+            (loop   
+                (print "Digite el nombre de la editorial(con comillas, ejemplo: \"Reynal & Hitchcock\"): ")
+                (setq  bookEditorial (read))
+                (when (stringp bookEditorial) (return))
+                (print "Nombre de la editorial no aceptado, no olvide las comillas")
+            )
+            (setf (Book-editorial book) bookEditorial)
+
+            ;valida precio del libro
+            (loop
+                (print "Digite el precio del libro (numero entero positivo): ")
+                (setq bookPrice (read))
+                (when (and (integerp bookPrice) (> bookPrice 0)) (return))
+                (print "Precio invalido, debe ser un numero entero positivo")
+            )
+            (setf (Book-price book) bookPrice)
+            (setf (aref bookArray bookCount) book)
+            (setq bookCount (+ bookCount 1))
+        )
+    )    
+)
+
+; Funcion encargada de buscar libros por su tema
+(defun showBooksByTopic (topic)
+    (if (= bookCount 0)
+        (print "No hay libros registrados")
+        (progn
+            (setq i 0)
+            (setq encontro nil)
+            (loop
+                (when (string= topic (Book-topic (aref bookArray i)))
+                    (setq book (aref bookArray i))
+                    (format t "~%Nombre: ~S~%" (Book-title book))
+                    (format t "Tema: ~S~%" (Book-topic book))
+                    (format t "Autor ~S~%" (Book-author book))
+                    (format t "Editorial: ~S~%" (Book-editorial book))
+                    (format t "Precio: $~S~%" (Book-price book))
+                    (setq encontro t)
+                )
+                (setq i (+ i 1))
+                (when (>= i bookCount) (return))
+            )
+            (when (null encontro)
+                (format t "~%No se encontraron libros con el tema ~S ~%" topic)
+            )
+        )
+    )
+)
+
+; Funcion encargada de mostrar todos los libros 
+(defun showAllBooks()
+    (if (= bookCount 0)
+        (print "No hay libros registrados")
+        (progn
+            (setq i 0)
+            (loop
+                (setq book (aref bookArray i))
+                (format t "~%Nombre: ~S~%" (Book-title book))
+                (format t "Tema: ~S~%" (Book-topic book))
+                (format t "Autor ~S~%" (Book-author book))
+                (format t "Editorial: ~S~%" (Book-editorial book))
+                (format t "Precio: $~S~%" (Book-price book))
+                (setq i (+ i 1))
+                (when (>= i bookCount)(return))
+            )
+        )
+    )
+)
+
+
+; Funcion encargada de buscar un libro por su nombre
+(defun searchSpecificBook ()
+    (if (= bookCount 0)
+        (print "No hay libros registrados")
+        (progn
+            (loop   
+                (print "Digite el nombre del libro que desea buscar (con comillas, ejemplo: \"El Principito\"): ")
+                (setq title (read))
+                (when (stringp title) (return))
+                (print "Nombre del libro no aceptado, no olvide las comillas")
+            )
+            (setq i 0)
+            (setq encontro nil)
+            (loop
+                (when (string= title (Book-title (aref bookArray i)))
+                    (setq book (aref bookArray i))
+                    (format t "~%Nombre: ~S~%" (Book-title book))
+                    (format t "Tema: ~S~%" (Book-topic book))
+                    (format t "Autor ~S~%" (Book-author book))
+                    (format t "Editorial: ~S~%" (Book-editorial book))
+                    (format t "Precio: $~S~%" (Book-price book))
+                    (setq encontro t)
+                )
+                (setq i (+ i 1))
+                (when (>= i bookCount) (return))
+            )
+            (when (null encontro)
+                (format t "~%No se encontraron el libro ~S ~%" title)
+            )
+        )
+    )
+)
+
+
+; Funcion encargada de eliminar un libro del vector por su titulo
+(defun deleteBook()
+    ; validar que haya libros
+    (if (= bookCount 0)
+        (print "No hay libros registrados")
+        (progn
+            ; pedir titulo del libro a eliminar
+            (loop
+                (print "Digite el nombre del libro a eliminar (con comillas, ejemplo: \"El Principito\"): ")
+                (setq titleToDelete (read))
+                (when (stringp titleToDelete) (return))
+                (print "Nombre no aceptado, no olvide las comillas")
+            )
+
+            ; buscar el libro en el vector
+            (setq posFound -1)
+            (setq i 0)
+            (loop
+                (when (string= titleToDelete (Book-title (aref bookArray i)))
+                    (setq posFound i)
+                )
+                (setq i (+ i 1))
+                (when (>= i bookCount) (return))
+            )
+
+            ; si no se encontro mostrar mensaje
+            (if (= posFound -1)
+                (format t "~%Libro \"~A\" no encontrado~%" titleToDelete)
+                ; si se encontro correr los libros hacia atras
+                (progn
+                    (setq i posFound)
+                    (loop
+                        (setf (aref bookArray i) (aref bookArray (+ i 1)))
+                        (setq i (+ i 1))
+                        (when (>= i (- bookCount 1)) (return))
+                    )
+                    ; limpiar ultima posicion y bajar contador
+                    (setf (aref bookArray (- bookCount 1)) nil)
+                    (setq bookCount (- bookCount 1))
+                    (format t "~%Libro ~S eliminado exitosamente~%" titleToDelete)
+                )
+            )
+        )
+    )
+)
+
+; Funcion encargada de mostrar los descuentos de los libros solo para clientes registrados
+(defun showDiscounts()
+    ; validar que haya libros
+    (if (= bookCount 0)
+        (print "No hay libros registrados")
+        (progn
+            (format t "~%--- DESCUENTOS PARA CLIENTES REGISTRADOS ---~%")
+            (setq i 0)
+            (loop
+                (setq book (aref bookArray i))
+                (setq precioDescuento (* (Book-price book) 0.9))
+                (format t "~%Nombre   : ~S~%" (Book-title book))
+                (format t "Precio   : $~S~%" (Book-price book))
+                ;Deje 10% por ahora 
+                (format t "Descuento: 10%~%")
+                (format t "Precio con descuento: $~S~%" precioDescuento)
+                (setq i (+ i 1))
+                (when (>= i bookCount) (return))
+            )
+        )
+    )
+)
