@@ -5,7 +5,14 @@
 |#
 
 (defun loadData()
+    ;variable global que ayuda a contar los libros que hay (Cambiar si se queman mas libros)
     (setq bookCount 4)
+    ;variable global que ayuda a contar los clientes que hay (Cambiar si se queman mas clientes)
+    (setq userCount 4)
+    ;variable que permite colocar el numero de cliente automaticamente, cuando se añada un cliente
+    ;esta variable se incrementara en 1
+    (setq customerNumberCount 104)
+
     (defstruct Book
         title
         topic
@@ -28,7 +35,7 @@
         book
     )
 
-    ;suponiendo que definimos un vector con 10 posiciones (sujeto a cambios)
+    ;suponiendo que definimos un vector de libros con 10 posiciones (sujeto a cambios)
     (setq bookArray(make-array 10))
 
     ;inicialice 4 libros 
@@ -63,5 +70,42 @@
         :editorial "El pais"
         :price 500000))
     (setf (aref bookArray 3) book4)
+
+    ;suponiendo que definimos un vector de clientes con 10 posiciones (sujeto a cambios)
+    (setq userArray(make-array 10))
+
+    ;inicialice 4 usuarios
+
+    (setq user1(make-User
+        :name "Luisa"
+        :lastName "Fernadez"
+        :address "Por ahi en Silvia"
+        :phoneNumber 3117612386
+        :customerNumber 100))
+    (setf (aref userArray 0) user1)
+
+    (setq user2(make-User
+        :name "Fernanda"
+        :lastName "Pastrana"
+        :address "Por ahi en Popayan"
+        :phoneNumber 3217612382
+        :customerNumber 101))
+    (setf (aref userArray 1) user2)
+
+    (setq user3(make-User
+        :name "Nicolas"
+        :lastName "Rocha"
+        :address "Cra 3ra 20N11"
+        :phoneNumber 3016132674
+        :customerNumber 102))
+    (setf (aref userArray 2) user3)
+
+    (setq user4(make-User
+        :name "Jose"
+        :lastName "Con tilde"
+        :address "Por ahi Cartago"
+        :phoneNumber 3676776677
+        :customerNumber 103))
+    (setf (aref userArray 3) user4)
 
 )
