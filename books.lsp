@@ -4,6 +4,30 @@
   Jose David Hurtado Arandano
 |#
 
+; Funcion auxiliar que muestra el menu de temas y retorna el tema seleccionado
+(defun selectTopic()
+    (loop
+        (print "Seleccione el tema:")
+        (print "  1.  Fantasia")
+        (print "  2.  Romance")
+        (print "  3.  Ciencia Ficcion")
+        (print "  4.  Terror")
+        (print "  5.  Realismo Magico")
+        (format t "~%")
+        (print "Digite su eleccion (debe digitar el numero, no el nombre del tema): ")
+        (setq opcionTema (read))
+        (when (and (integerp opcionTema) (>= opcionTema 1) (<= opcionTema 5)) (return))
+        (print "Opcion invalida, intente de nuevo")
+    )
+    (case opcionTema
+        (1 "Fantasia")
+        (2 "Romance")
+        (3 "Ciencia Ficcion")
+        (4 "Terror")
+        (5 "Realismo Magico")
+    )
+)
+
 ; Funcion encargada de añadir un libro
 (defun addBook()
     (if (>= bookCount (length bookArray))
@@ -19,21 +43,8 @@
             )
             (setf (Book-title book) bookTitle)
 
-            #|
-            --------------------------------------------------------------------------------------------------
-            IMPORTANTEEEEEE
-            Podemos dejarlo asi, o dejar ya unos temas en especifico, y simplemente que 
-            la persona los seleccione en vez de digitarlos
-            --------------------------------------------------------------------------------------------------
-            |#
-            ;valida tema del libro
-            (loop   
-                (print "Digite el tema del libro (con comillas, ejemplo: \"Fantasia\"): ")
-                (setq  bookTopic (read))
-                (when (stringp bookTopic) (return))
-                (print "Tema no aceptado, no olvide las comillas")
-            )
-            (setf (Book-topic book) bookTopic)
+            ;Aqui uso la funcon auxiliar para el tema 
+            (setf (Book-topic book) (selectTopic))
 
             ;valida nombre del autor
             (loop   
@@ -68,10 +79,11 @@
 )
 
 ; Funcion encargada de buscar libros por su tema
-(defun showBooksByTopic (topic)
+(defun showBooksByTopic ()
     (if (= bookCount 0)
         (print "No hay libros registrados")
         (progn
+            (setq topic (selectTopic))
             (setq i 0)
             (setq encontro nil)
             (loop
