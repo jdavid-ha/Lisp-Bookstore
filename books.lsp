@@ -91,7 +91,7 @@
                     (setq book (aref bookArray i))
                     (format t "~%Nombre: ~S~%" (Book-title book))
                     (format t "Tema: ~S~%" (Book-topic book))
-                    (format t "Autor ~S~%" (Book-author book))
+                    (format t "Autor: ~S~%" (Book-author book))
                     (format t "Editorial: ~S~%" (Book-editorial book))
                     (format t "Precio: $~S~%" (Book-price book))
                     (setq encontro t)
@@ -116,7 +116,7 @@
                 (setq book (aref bookArray i))
                 (format t "~%Nombre: ~S~%" (Book-title book))
                 (format t "Tema: ~S~%" (Book-topic book))
-                (format t "Autor ~S~%" (Book-author book))
+                (format t "Autor: ~S~%" (Book-author book))
                 (format t "Editorial: ~S~%" (Book-editorial book))
                 (format t "Precio: $~S~%" (Book-price book))
                 (setq i (+ i 1))
@@ -145,7 +145,7 @@
                     (setq book (aref bookArray i))
                     (format t "~%Nombre: ~S~%" (Book-title book))
                     (format t "Tema: ~S~%" (Book-topic book))
-                    (format t "Autor ~S~%" (Book-author book))
+                    (format t "Autor: ~S~%" (Book-author book))
                     (format t "Editorial: ~S~%" (Book-editorial book))
                     (format t "Precio: $~S~%" (Book-price book))
                     (setq encontro t)
@@ -188,7 +188,7 @@
 
             ; si no se encontro mostrar mensaje
             (if (= posFound -1)
-                (format t "~%Libro \"~A\" no encontrado~%" titleToDelete)
+                (format t "~%Libro ~S no encontrado~%" titleToDelete)
                 ; si se encontro correr los libros hacia atras
                 (progn
                     (setq i posFound)
