@@ -19,6 +19,8 @@
     (setq customerNumberCount 104)
     ; variable global que representa el porcentaje de descuento para clientes registrados
     (setq discountRate 0.1)
+    ;Variable que cuenta los juegos
+    (setq gameCount 4)
     (defstruct Book
         title
         topic
@@ -39,7 +41,40 @@
         date
         customer
         book
+        game
     )
+
+    (defstruct Game
+        title
+        category
+        price
+    )
+
+    ;vector de juegos con 10 posiciones
+    (setq gameArray (make-array 10))
+    (setq game1 (make-Game
+        :title "fornike"
+        :category "Battle royale"
+        :price 100000))
+    (setf (aref gameArray 0) game1)
+
+    (setq game2 (make-Game
+        :title "Krlos duty"
+        :category "Shooter"
+        :price 300000))
+    (setf (aref gameArray 1) game2)
+
+    (setq game3 (make-Game
+        :title "Valito"
+        :category "Tatical Shoo"
+        :price 5000))
+    (setf (aref gameArray 2) game3)
+
+    (setq game4 (make-Game
+        :title "it takes two"
+        :category "Family Friendly"
+        :price 156000))
+    (setf (aref gameArray 3) game4)
 
     ; vector de libros con 10 posiciones
     (setq bookArray (make-array 10))
