@@ -4,6 +4,10 @@
   Jose David Hurtado Arandano
 |#
 
+(defun prompt-read ()
+    (finish-output)
+    (read))
+
 (defun loadData()
     ; variable global que ayuda a contar los libros que hay
     (setq bookCount 4)

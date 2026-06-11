@@ -1,4 +1,4 @@
-#| 
+#|
   integrantes:
   Nicolas Rocha Gutierrez
   Jose David Hurtado Arandano
@@ -7,43 +7,43 @@
 ; Funcion que se encarga de registrar un cliente
 (defun registerCustomer()
     (if (>= customerCount (length customerArray))
-        (print "No hay espacio para mas clientes")
+        (format t "No hay espacio para mas clientes~%")
         (progn
             (setq customer (make-Customer))
 
             ; valida nombre del cliente
-            (loop   
-                (print "Digite el nombre del cliente(con comillas, ejemplo: \"Luisa\"): ")
-                (setq customerName (read))
+            (loop
+                (format t "Digite el nombre del cliente (con comillas, ejemplo: \"Luisa\"): ")
+                (setq customerName (prompt-read))
                 (when (stringp customerName) (return))
-                (print "Nombre no valido, no olvide las comillas")
+                (format t "Nombre no valido, no olvide las comillas~%")
             )
             (setf (Customer-name customer) customerName)
 
             ; valida apellido del cliente
-            (loop   
-                (print "Digite el apellido del cliente(con comillas, ejemplo: \"Fernanda\"): ")
-                (setq customerLastName (read))
+            (loop
+                (format t "Digite el apellido del cliente (con comillas, ejemplo: \"Fernandez\"): ")
+                (setq customerLastName (prompt-read))
                 (when (stringp customerLastName) (return))
-                (print "Apellido no valido, no olvide las comillas")
+                (format t "Apellido no valido, no olvide las comillas~%")
             )
             (setf (Customer-lastName customer) customerLastName)
 
             ; valida direccion del cliente
-            (loop   
-                (print "Digite la direccion del cliente (con comillas, ejemplo: \"Cra 3ra 28N11\"): ")
-                (setq customerAddress (read))
+            (loop
+                (format t "Digite la direccion del cliente (con comillas, ejemplo: \"Cra 3ra 28N11\"): ")
+                (setq customerAddress (prompt-read))
                 (when (stringp customerAddress) (return))
-                (print "Direccion no valida, no olvide las comillas")
+                (format t "Direccion no valida, no olvide las comillas~%")
             )
             (setf (Customer-address customer) customerAddress)
 
             ; valida numero de celular del cliente
             (loop
-                (print "Digite el numero de celular del cliente(numero entero positivo): ")
-                (setq customerPhone (read))
+                (format t "Digite el numero de celular del cliente (numero entero positivo): ")
+                (setq customerPhone (prompt-read))
                 (when (and (integerp customerPhone) (> customerPhone 0)) (return))
-                (print "Numero de telefono invalido, debe ser un numero entero positivo")
+                (format t "Numero de telefono invalido, debe ser un numero entero positivo~%")
             )
             (setf (Customer-phoneNumber customer) customerPhone)
 
@@ -54,7 +54,7 @@
             ; se guarda el cliente en el vector
             (setf (aref customerArray customerCount) customer)
             (setq customerCount (+ customerCount 1))
-            (format t "~%Cliente registrado exitosamente con numero ~S~%" (Customer-customerNumber customer))
+            (format t "~%Cliente registrado exitosamente con numero ~A~%" (Customer-customerNumber customer))
         )
     )
 )
@@ -62,16 +62,16 @@
 ; Funcion que se encarga de mostrar los clientes registrados
 (defun showRegisteredCustomers()
     (if (= customerCount 0)
-        (print "No hay clientes registrados")
+        (format t "No hay clientes registrados~%")
         (progn
             (setq i 0)
             (loop
                 (setq customer (aref customerArray i))
-                (format t "~%Nombre          : ~S~%" (Customer-name customer))
-                (format t "Apellido        : ~S~%" (Customer-lastName customer))
-                (format t "Direccion       : ~S~%" (Customer-address customer))
-                (format t "Numero Telefono : ~S~%" (Customer-phoneNumber customer))
-                (format t "Numero Cliente  : ~S~%" (Customer-customerNumber customer))
+                (format t "~%Nombre          : ~A~%" (Customer-name customer))
+                (format t "Apellido        : ~A~%" (Customer-lastName customer))
+                (format t "Direccion       : ~A~%" (Customer-address customer))
+                (format t "Numero Telefono : ~A~%" (Customer-phoneNumber customer))
+                (format t "Numero Cliente  : ~A~%" (Customer-customerNumber customer))
                 (setq i (+ i 1))
                 (when (>= i customerCount) (return))
             )
@@ -82,14 +82,14 @@
 ; Funcion que se encarga de eliminar un cliente registrado por su numero de cliente
 (defun deleteRegisteredCustomers()
     (if (= customerCount 0)
-        (print "No hay clientes registrados")
+        (format t "No hay clientes registrados~%")
         (progn
             ; pedir numero de cliente a eliminar
             (loop
-                (print "Digite el numero de cliente a eliminar (numero entero positivo): ")
-                (setq customerNumberToDelete (read))
+                (format t "Digite el numero de cliente a eliminar (numero entero positivo): ")
+                (setq customerNumberToDelete (prompt-read))
                 (when (and (integerp customerNumberToDelete) (> customerNumberToDelete 0)) (return))
-                (print "Numero de cliente no valido, debe ser un numero entero positivo")
+                (format t "Numero de cliente no valido, debe ser un numero entero positivo~%")
             )
 
             ; buscar el cliente en el vector
@@ -105,7 +105,7 @@
 
             ; si no se encontro mostrar mensaje
             (if (= posFound -1)
-                (format t "~%Cliente con numero ~S no encontrado~%" customerNumberToDelete)
+                (format t "~%Cliente con numero ~A no encontrado~%" customerNumberToDelete)
                 ; si se encontro correr los clientes hacia atras
                 (progn
                     (setq i posFound)
@@ -117,9 +117,24 @@
                     ; limpiar ultima posicion y bajar contador
                     (setf (aref customerArray (- customerCount 1)) nil)
                     (setq customerCount (- customerCount 1))
-                    (format t "~%Cliente con numero ~S eliminado exitosamente~%" customerNumberToDelete)
+                    (format t "~%Cliente con numero ~A eliminado exitosamente~%" customerNumberToDelete)
                 )
             )
         )
     )
+)
+
+; Funcion auxiliar que busca un cliente registrado por su numero de cliente
+; retorna el cliente si existe, nil si no
+(defun findCustomerByNumber (customerNumber)
+    (setq found nil)
+    (setq i 0)
+    (loop
+        (when (= customerNumber (Customer-customerNumber (aref customerArray i)))
+            (setq found (aref customerArray i))
+        )
+        (setq i (+ i 1))
+        (when (>= i customerCount) (return))
+    )
+    found
 )

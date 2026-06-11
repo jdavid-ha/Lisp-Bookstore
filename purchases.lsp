@@ -1,121 +1,88 @@
-#| 
+#|
   integrantes:
   Nicolas Rocha Gutierrez
   Jose David Hurtado Arandano
 |#
 
-; Funcion auxiliar que busca un cliente registrado por su numero de cliente
-; retorna el cliente si existe, nil si no
-(defun findCustomerByNumber (customerNumber)
-    (setq found nil)
-    (setq i 0)
-    (loop
-        (when (= customerNumber (Customer-customerNumber (aref customerArray i)))
-            (setq found (aref customerArray i))
-        )
-        (setq i (+ i 1))
-        (when (>= i customerCount) (return))
-    )
-    found
-)
-
-; Funcion auxiliar que pide y valida la fecha de compra
-; retorna la fecha como string en formato DD/MM/AAAA
+; Funcion auxiliar que retorna la fecha actual del sistema
+; retorna la fecha como string en formato DD-MM-AAAA
 (defun askDate()
+    (multiple-value-bind (sec min hour day month year)
+        (decode-universal-time (get-universal-time))
+        (format nil "~2,'0d-~2,'0d-~d" day month year))
+    #|
     (loop
-        (print "Digite el dia de la compra (1-31): ")
-        (setq day (read))
+        (format t "Digite el dia de la compra (1-31): ")
+        (setq day (prompt-read))
         (when (and (integerp day) (>= day 1) (<= day 31)) (return))
-        (print "Dia invalido, debe ser un numero entre 1 y 31")
+        (format t "Dia invalido, debe ser un numero entre 1 y 31~%")
     )
     (loop
-        (print "Digite el mes de la compra (1-12): ")
-        (setq month (read))
+        (format t "Digite el mes de la compra (1-12): ")
+        (setq month (prompt-read))
         (when (and (integerp month) (>= month 1) (<= month 12)) (return))
-        (print "Mes invalido, debe ser un numero entre 1 y 12")
+        (format t "Mes invalido, debe ser un numero entre 1 y 12~%")
     )
     (loop
-        (print "Digite el anio de la compra (numero entero positivo): ")
-        (setq year (read))
+        (format t "Digite el anio de la compra (numero entero positivo): ")
+        (setq year (prompt-read))
         (when (and (integerp year) (> year 0)) (return))
-        (print "Anio invalido, debe ser un numero entero positivo")
+        (format t "Anio invalido, debe ser un numero entero positivo~%")
     )
-    (format nil "~S/~S/~S" day month year)
-)
-
-; Funcion auxiliar que muestra los libros disponibles y retorna el libro seleccionado
-(defun selectBook()
-    (format t "~%--- LIBROS DISPONIBLES ---~%")
-    (setq i 0)
-    (loop
-        (setq book (aref bookArray i))
-        (format t "~S. ~S - ~S - $~S~%"
-            (+ i 1)
-            (Book-title book)
-            (Book-topic book)
-            (Book-price book)
-        )
-        (setq i (+ i 1))
-        (when (>= i bookCount) (return))
-    )
-    (loop
-        (print "Seleccione el numero del libro a comprar: ")
-        (setq bookOption (read))
-        (when (and (integerp bookOption) (>= bookOption 1) (<= bookOption bookCount)) (return))
-        (print "Opcion invalida, intente de nuevo")
-    )
-    (aref bookArray (- bookOption 1))
+    (format nil "~A/~A/~A" day month year)
+    |#
 )
 
 ; Funcion encargada de registrar la compra de un libro con su respectivo pago
 (defun buyBook()
     (if (= bookCount 0)
-        (print "No hay libros disponibles")
+        (format t "No hay libros disponibles~%")
         (progn
             (if (>= purchaseCount (length purchaseArray))
-                (print "No hay espacio para mas compras")
+                (format t "No hay espacio para mas compras~%")
                 (progn
                     (setq purchase (make-Purchase))
 
                     ; preguntar si es cliente registrado
                     (loop
-                        (print "Es usted un cliente registrado?")
-                        (print "  1.  Si")
-                        (print "  2.  No")
+                        (format t "Es usted un cliente registrado?~%")
+                        (format t "  1.  Si~%")
+                        (format t "  2.  No~%")
                         (format t "~%")
-                        (print "Digite su respuesta (debe digitar el numero): ")
-                        (setq isRegistered (read))
+                        (format t "Digite su respuesta (debe digitar el numero): ")
+                        (setq isRegistered (prompt-read))
                         (when (and (integerp isRegistered) (or (= isRegistered 1) (= isRegistered 2))) (return))
-                        (print "Opcion invalida, intente de nuevo")
+                        (format t "Opcion invalida, intente de nuevo~%")
                     )
 
                     (if (= isRegistered 1)
                         ; cliente registrado: buscar por numero de cliente
                         (progn
                             (loop
-                                (print "Digite su numero de cliente (numero entero positivo): ")
-                                (setq customerNum (read))
+                                (format t "Digite su numero de cliente (numero entero positivo): ")
+                                (setq customerNum (prompt-read))
                                 (when (and (integerp customerNum) (> customerNum 0)) (return))
-                                (print "Numero de cliente invalido, debe ser un numero entero positivo")
+                                (format t "Numero de cliente invalido, debe ser un numero entero positivo~%")
                             )
                             (setq foundCustomer (findCustomerByNumber customerNum))
                             (if (null foundCustomer)
-                                (format t "~%Cliente con numero ~S no encontrado~%" customerNum)
+                                (format t "~%Cliente con numero ~A no encontrado~%" customerNum)
                                 (progn
                                     (setf (Purchase-customer purchase) foundCustomer)
-                                    (format t "~%Bienvenido ~S ~S~%"
+                                    (format t "~%Bienvenido ~A ~A~%"
                                         (Customer-name foundCustomer)
                                         (Customer-lastName foundCustomer)
                                     )
                                     ; seleccionar libro usando funcion auxiliar
                                     (setf (Purchase-book purchase) (selectBook))
 
-                                    ; pedir fecha
+                                    ; tomar fecha
                                     (setf (Purchase-date purchase) (askDate))
 
                                     ; asignar compra y guardar
                                     (setf (aref purchaseArray purchaseCount) purchase)
                                     (setq purchaseCount (+ purchaseCount 1))
+                                    (removeBookFromStock (Book-title (Purchase-book purchase)))
 
                                     ; calcular precio con descuento
                                     (setq bookPrice (Book-price (Purchase-book purchase)))
@@ -124,11 +91,11 @@
 
                                     ; mostrar resumen de la compra
                                     (format t "~%--- RESUMEN DE COMPRA ---~%")
-                                    (format t "Libro            : ~S~%" (Book-title (Purchase-book purchase)))
-                                    (format t "Fecha            : ~S~%" (Purchase-date purchase))
-                                    (format t "Precio original  : $~S~%" bookPrice)
-                                    (format t "Descuento (~S%) : $~S~%" (* discountRate 100) discount)
-                                    (format t "Total a pagar    : $~S~%" finalPrice)
+                                    (format t "Libro            : ~A~%" (Book-title (Purchase-book purchase)))
+                                    (format t "Fecha            : ~A~%" (Purchase-date purchase))
+                                    (format t "Precio original  : $~A~%" bookPrice)
+                                    (format t "Descuento (~A%) : $~A~%" (* discountRate 100) discount)
+                                    (format t "Total a pagar    : $~A~%" finalPrice)
                                     (format t "~%Compra realizada exitosamente!~%")
                                 )
                             )
@@ -138,34 +105,34 @@
                             (setq tempCustomer (make-Customer :customerNumber nil))
 
                             (loop
-                                (print "Digite su nombre (con comillas, ejemplo: \"Juan\"): ")
-                                (setq tempName (read))
+                                (format t "Digite su nombre (con comillas, ejemplo: \"Juan\"): ")
+                                (setq tempName (prompt-read))
                                 (when (stringp tempName) (return))
-                                (print "Nombre invalido, no olvide las comillas")
+                                (format t "Nombre invalido, no olvide las comillas~%")
                             )
                             (setf (Customer-name tempCustomer) tempName)
 
                             (loop
-                                (print "Digite su apellido (con comillas, ejemplo: \"Perez\"): ")
-                                (setq tempLastName (read))
+                                (format t "Digite su apellido (con comillas, ejemplo: \"Perez\"): ")
+                                (setq tempLastName (prompt-read))
                                 (when (stringp tempLastName) (return))
-                                (print "Apellido invalido, no olvide las comillas")
+                                (format t "Apellido invalido, no olvide las comillas~%")
                             )
                             (setf (Customer-lastName tempCustomer) tempLastName)
 
                             (loop
-                                (print "Digite su direccion (con comillas, ejemplo: \"Cra 1 28N11\"): ")
-                                (setq tempAddress (read))
+                                (format t "Digite su direccion (con comillas, ejemplo: \"Cra 1 28N11\"): ")
+                                (setq tempAddress (prompt-read))
                                 (when (stringp tempAddress) (return))
-                                (print "Direccion invalida, no olvide las comillas")
+                                (format t "Direccion invalida, no olvide las comillas~%")
                             )
                             (setf (Customer-address tempCustomer) tempAddress)
 
                             (loop
-                                (print "Digite su numero de telefono (numero entero positivo): ")
-                                (setq tempPhone (read))
+                                (format t "Digite su numero de telefono (numero entero positivo): ")
+                                (setq tempPhone (prompt-read))
                                 (when (and (integerp tempPhone) (> tempPhone 0)) (return))
-                                (print "Telefono invalido, debe ser un numero entero positivo")
+                                (format t "Telefono invalido, debe ser un numero entero positivo~%")
                             )
                             (setf (Customer-phoneNumber tempCustomer) tempPhone)
                             (setf (Purchase-customer purchase) tempCustomer)
@@ -173,18 +140,19 @@
                             ; seleccionar libro usando funcion auxiliar
                             (setf (Purchase-book purchase) (selectBook))
 
-                            ; pedir fecha
+                            ; tomar fecha
                             (setf (Purchase-date purchase) (askDate))
 
                             ; asignar compra y guardar
                             (setf (aref purchaseArray purchaseCount) purchase)
                             (setq purchaseCount (+ purchaseCount 1))
+                            (removeBookFromStock (Book-title (Purchase-book purchase)))
 
                             ; mostrar resumen sin descuento
                             (format t "~%--- RESUMEN DE COMPRA ---~%")
-                            (format t "Libro            : ~S~%" (Book-title (Purchase-book purchase)))
-                            (format t "Fecha            : ~S~%" (Purchase-date purchase))
-                            (format t "Total a pagar    : $~S~%" (Book-price (Purchase-book purchase)))
+                            (format t "Libro            : ~A~%" (Book-title (Purchase-book purchase)))
+                            (format t "Fecha            : ~A~%" (Purchase-date purchase))
+                            (format t "Total a pagar    : $~A~%" (Book-price (Purchase-book purchase)))
                             (format t "~%Compra realizada exitosamente!~%")
                         )
                     )
@@ -197,28 +165,28 @@
 ; Funcion encargada de mostrar todas las compras registradas
 (defun showAllPurchases()
     (if (= purchaseCount 0)
-        (print "No hay compras registradas")
+        (format t "No hay compras registradas~%")
         (progn
             (setq i 0)
             (loop
                 (setq purchase (aref purchaseArray i))
-                (format t "~%--- COMPRA ~S ---~%" (+ i 1))
-                (format t "Fecha    : ~S~%" (Purchase-date purchase))
-                (format t "Cliente  : ~S ~S~%"
+                (format t "~%--- COMPRA ~A ---~%" (+ i 1))
+                (format t "Fecha    : ~A~%" (Purchase-date purchase))
+                (format t "Cliente  : ~A ~A~%"
                     (Customer-name (Purchase-customer purchase))
                     (Customer-lastName (Purchase-customer purchase))
                 )
-                (format t "Libro    : ~S~%" (Book-title (Purchase-book purchase)))
+                (format t "Libro    : ~A~%" (Book-title (Purchase-book purchase)))
                 (setq bookPrice (Book-price (Purchase-book purchase)))
                 (if (null (Customer-customerNumber (Purchase-customer purchase)))
                     ; cliente no registrado: precio original
-                    (format t "Total pagado     : $~S~%" bookPrice)
+                    (format t "Total pagado     : $~A~%" bookPrice)
                     ; cliente registrado: precio con descuento
                     (progn
                         (setq finalPrice (- bookPrice (* bookPrice discountRate)))
-                        (format t "Precio original  : $~S~%" bookPrice)
-                        (format t "Descuento (~S%) : $~S~%" (* discountRate 100) (* bookPrice discountRate))
-                        (format t "Total pagado     : $~S~%" finalPrice)
+                        (format t "Precio original  : $~A~%" bookPrice)
+                        (format t "Descuento (~A%) : $~A~%" (* discountRate 100) (* bookPrice discountRate))
+                        (format t "Total pagado     : $~A~%" finalPrice)
                     )
                 )
                 (setq i (+ i 1))
@@ -231,17 +199,17 @@
 ; Funcion encargada de mostrar las compras de un cliente registrado
 (defun showCustomerPurchases()
     (if (= purchaseCount 0)
-        (print "No hay compras registradas")
+        (format t "No hay compras registradas~%")
         (progn
             (loop
-                (print "Digite el numero de cliente (numero entero positivo): ")
-                (setq customerNum (read))
+                (format t "Digite el numero de cliente (numero entero positivo): ")
+                (setq customerNum (prompt-read))
                 (when (and (integerp customerNum) (> customerNum 0)) (return))
-                (print "Numero de cliente invalido, debe ser un numero entero positivo")
+                (format t "Numero de cliente invalido, debe ser un numero entero positivo~%")
             )
             (setq foundCustomer (findCustomerByNumber customerNum))
             (if (null foundCustomer)
-                (format t "~%Cliente con numero ~S no encontrado~%" customerNum)
+                (format t "~%Cliente con numero ~A no encontrado~%" customerNum)
                 (progn
                     (setq encontro nil)
                     (setq i 0)
@@ -251,21 +219,21 @@
                         (when (and
                                 (not (null (Customer-customerNumber purchaseCustomer)))
                                 (= customerNum (Customer-customerNumber purchaseCustomer)))
-                            (format t "~%--- COMPRA ~S ---~%" (+ i 1))
-                            (format t "Fecha    : ~S~%" (Purchase-date purchase))
-                            (format t "Libro    : ~S~%" (Book-title (Purchase-book purchase)))
+                            (format t "~%--- COMPRA ~A ---~%" (+ i 1))
+                            (format t "Fecha    : ~A~%" (Purchase-date purchase))
+                            (format t "Libro    : ~A~%" (Book-title (Purchase-book purchase)))
                             (setq bookPrice (Book-price (Purchase-book purchase)))
                             (setq finalPrice (- bookPrice (* bookPrice discountRate)))
-                            (format t "Precio original  : $~S~%" bookPrice)
-                            (format t "Descuento (~S%) : $~S~%" (* discountRate 100) (* bookPrice discountRate))
-                            (format t "Total pagado     : $~S~%" finalPrice)
+                            (format t "Precio original  : $~A~%" bookPrice)
+                            (format t "Descuento (~A%) : $~A~%" (* discountRate 100) (* bookPrice discountRate))
+                            (format t "Total pagado     : $~A~%" finalPrice)
                             (setq encontro t)
                         )
                         (setq i (+ i 1))
                         (when (>= i purchaseCount) (return))
                     )
                     (when (null encontro)
-                        (format t "~%El cliente ~S ~S no tiene compras registradas~%"
+                        (format t "~%El cliente ~A ~A no tiene compras registradas~%"
                             (Customer-name foundCustomer)
                             (Customer-lastName foundCustomer)
                         )
