@@ -13,7 +13,8 @@
     (setq purchaseCount 0)
     ; variable que permite colocar el numero de cliente automaticamente
     (setq customerNumberCount 104)
-
+    ; variable global que representa el porcentaje de descuento para clientes registrados
+    (setq discountRate 0.1)
     (defstruct Book
         title
         topic
@@ -29,7 +30,7 @@
         phoneNumber
         customerNumber
     )
-    
+
     (defstruct Purchase
         date
         customer

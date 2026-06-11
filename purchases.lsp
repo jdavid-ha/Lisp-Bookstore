@@ -117,17 +117,17 @@
                                     (setf (aref purchaseArray purchaseCount) purchase)
                                     (setq purchaseCount (+ purchaseCount 1))
 
-                                    ; calcular precio con descuento del 10%
+                                    ; calcular precio con descuento
                                     (setq bookPrice (Book-price (Purchase-book purchase)))
-                                    (setq discount (* bookPrice 0.1))
+                                    (setq discount (* bookPrice discountRate))
                                     (setq finalPrice (- bookPrice discount))
 
-                                    ; mostrar resumen con descuento
+                                    ; mostrar resumen de la compra
                                     (format t "~%--- RESUMEN DE COMPRA ---~%")
                                     (format t "Libro            : ~S~%" (Book-title (Purchase-book purchase)))
                                     (format t "Fecha            : ~S~%" (Purchase-date purchase))
                                     (format t "Precio original  : $~S~%" bookPrice)
-                                    (format t "Descuento (10%%) : $~S~%" discount)
+                                    (format t "Descuento (~S%) : $~S~%" (* discountRate 100) discount)
                                     (format t "Total a pagar    : $~S~%" finalPrice)
                                     (format t "~%Compra realizada exitosamente!~%")
                                 )
@@ -215,9 +215,9 @@
                     (format t "Total pagado     : $~S~%" bookPrice)
                     ; cliente registrado: precio con descuento
                     (progn
-                        (setq finalPrice (- bookPrice (* bookPrice 0.1)))
+                        (setq finalPrice (- bookPrice (* bookPrice discountRate)))
                         (format t "Precio original  : $~S~%" bookPrice)
-                        (format t "Descuento (10%%) : $~S~%" (* bookPrice 0.1))
+                        (format t "Descuento (~S%) : $~S~%" (* discountRate 100) (* bookPrice discountRate))
                         (format t "Total pagado     : $~S~%" finalPrice)
                     )
                 )
@@ -255,9 +255,9 @@
                             (format t "Fecha    : ~S~%" (Purchase-date purchase))
                             (format t "Libro    : ~S~%" (Book-title (Purchase-book purchase)))
                             (setq bookPrice (Book-price (Purchase-book purchase)))
-                            (setq finalPrice (- bookPrice (* bookPrice 0.1)))
+                            (setq finalPrice (- bookPrice (* bookPrice discountRate)))
                             (format t "Precio original  : $~S~%" bookPrice)
-                            (format t "Descuento (10%%) : $~S~%" (* bookPrice 0.1))
+                            (format t "Descuento (~S%) : $~S~%" (* discountRate 100) (* bookPrice discountRate))
                             (format t "Total pagado     : $~S~%" finalPrice)
                             (setq encontro t)
                         )

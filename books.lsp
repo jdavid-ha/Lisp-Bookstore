@@ -213,15 +213,16 @@
     (if (= bookCount 0)
         (print "No hay libros registrados")
         (progn
+            (format t "~%NOTA: Los precios con descuento son exclusivos para clientes registrados~%")
             (format t "~%--- DESCUENTOS PARA CLIENTES REGISTRADOS ---~%")
             (setq i 0)
             (loop
                 (setq book (aref bookArray i))
-                (setq precioDescuento (* (Book-price book) 0.9))
-                (format t "~%Nombre   : ~S~%" (Book-title book))
-                (format t "Precio   : $~S~%" (Book-price book))
-                ;Deje 10% por ahora 
-                (format t "Descuento: 10%~%")
+                (setq bookPrice (Book-price book))
+                (setq precioDescuento (- bookPrice (* bookPrice discountRate)))
+                (format t "~%Nombre              : ~S~%" (Book-title book))
+                (format t "Precio original     : $~S~%" bookPrice)
+                (format t "Descuento           : ~S%~%" (* discountRate 100))
                 (format t "Precio con descuento: $~S~%" precioDescuento)
                 (setq i (+ i 1))
                 (when (>= i bookCount) (return))
